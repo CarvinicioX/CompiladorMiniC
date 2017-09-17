@@ -1,0 +1,15 @@
+package proyecto_compi;
+
+import java_cup.runtime.*;
+
+terminal Integer INT;
+terminal Character CHAR;
+terminal String NUM;
+terminal FOR, IF, ELSE, WHILE, RETURN, MAIN, PRINTF, SCANF;
+
+non terminal Integer E, T, F;
+non terminal S;
+
+S ::= E:e			{:System.out.println(e);:};
+E ::= E:e MAS T:t               {:RESULT = e + t;:};
+F ::= NUM:n			{:RESULT = new Integer(n);:};
