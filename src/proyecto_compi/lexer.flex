@@ -69,7 +69,6 @@ PuntoYComa          = ;
 Coma                = ,
 Else                = else
 While               = while
-AND                 = &
 For                 = for
 If                  = if
 break               = break
