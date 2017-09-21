@@ -1,6 +1,8 @@
 package proyecto_compi;
 import java.io.*;
-import java_cup.runtime.*; 
+import java_cup.runtime.*;
+import AST.*; 
+
 
 parser code
 {:
@@ -8,17 +10,7 @@ parser code
 		report_error("Error de sintaxis. Linea: " + (s.right + 1) +
 		" Columna: " + s.left + ". Texto: \"" + s.value + "\"", null);
 	}
-        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
-        //report_fatal_error("Fatal Error: " + s.value, null);
-        }
-
-       /* public void syntax_error(Symbol s)
-    {
-        Token t = (Token)s.value;
-        report_error("Se ha encontrado un error sintactico en linea " + t.getLinea() + ", columna " + t.getColumna() + " -> No se esperaba un < " + t.getContenido() + " >", null);
-
-        errores++;
-    }*/
+       
 
 
 :}
@@ -27,15 +19,14 @@ parser code
 
 
 
-terminal INT, CHAR, INTPUNT, CHARPUNT;
+terminal INT, CHAR;
+terminal String INTPUNT, CHARPUNT;
 
-terminal ID;
+terminal String ID;
 terminal IF;
 terminal ELSE;
 terminal WHILE;
 terminal FOR;
-terminal TRUE;
-terminal FALSE;
 terminal MAIN; 
 terminal RETURN; 
 terminal VOID; 
@@ -43,8 +34,8 @@ terminal CORCHETEIZQUIERDO;
 terminal CORCHETEDERECHO;
 terminal LLAVEIZQUIERDA;
 terminal LLAVEDERECHA;
-terminal CONSTCHAR CONSTCHAR; 
-terminal CONSTSTR CONSTSTR;
+terminal String CONSTCHAR; 
+terminal String CONSTSTR;
 terminal PARENTESISIZQUIERDO; 
 terminal PARENTESISDERECHO;
 terminal IGUAL;
@@ -55,15 +46,30 @@ terminal SCANF;
 terminal PERCENTAGE;
 terminal PERCENTAGEDIGIT;
 terminal PERCENTAGESTRING;
-terminal NUM;
-terminal OperARITMETICOIGUAL;
+terminal PERCENTAGECHART;
+terminal String NUM;
+terminal BREAK;
+terminal MASMAS;
 terminal OPERADORSUMA;
-terminal OPERADORMULTIPLICACION; 
+terminal OPERADORRESTA;
+terminal OPERADORMULTIPLICACION;
+terminal OPERADORDIV; 
+terminal MENOSMENOS;
+terminal MASIGUAL;
+terminal MENOSIGUAL;
+terminal MULTIIGUAL;
+terminal DIVIGUAL;
 terminal MODASIGNACION;  
-terminal OPERADORRELACIONAL;
+terminal MENORQUE;
+terminal MAYORQUE;
+terminal MAYORIGUAL;
+terminal MENORIGUAL;
+terminal NOTIGUAL;
+terminal IGUALQUE;
 terminal MODARITMETICO;
 terminal INTERROGACION;
-terminal OPERADORLOGICO;
+terminal ANDAND;
+terminal OROR;
 terminal PUNTOYCOMA;
 terminal COMA;
 terminal DOSPUNTOS;
@@ -71,216 +77,261 @@ terminal PARAMETROSCANF;
 terminal AND;
 terminal IMPORT;
 
-non terminal programa;
-non terminal main;
-non terminal codigo;
-non terminal declaracion_funcion;
-non terminal operacion_aritmetica;
-non terminal operacion_aritmetica2;
-non terminal operacion_aritmetica3;
-non terminal declaracion_variable;
-non terminal tipo;
-non terminal variable;
-non terminal elemento_array;
-non terminal asignacion_variable_coma;
-non terminal asignacion_variable;
-non terminal IncrementarDecrementarVariable incrementarDecrementarVariable;
-non terminal scans;
-non terminal print;
-non terminal _if;
-non terminal else;
-non terminal _while;
-non terminal _for;
-non terminal for_inicializacion;
-non terminal for_inicializacion2;
-non terminal for_actualizacion;
-non terminal for_actualizacion_coma; 
-non terminal lista_variables;
-non terminal for_inicializacion_coma;
-non terminal condicion;
-non terminal condicion_operador_logico;
-non terminal inicializacion_arreglo;
-non terminal inicializacion_arreglo_coma;
-non terminal declaracion_funcion_parametros;
-non terminal declaracion_funcion_parametros_coma;
-non terminal funciones;
-non terminal funciones_parametros;
-non terminal funciones_parametros_coma;
-non terminal llamado_funcion;
-non terminal llamado_funcion_parametros;
-non terminal llamado_funcion_parametros_coma;
-non terminal Return;
-non terminal codigos;
-non terminal declaracion_variables;
+non terminal arg_list;
+non terminal args;
+non terminal Assignment_Expression assignment_expression;
+non terminal Assignment_ExpressionP assignment_expressionP;
+non terminal Assignment_Statement assignment_statement;
+non terminal Boolean_Expression boolean_expression;
+non terminal condition;
+non terminal conditionP;
+non terminal Constant constant;
+non terminal E1;
+non terminal E2;
+non terminal E3;
+non terminal expr_for;
+non terminal Expression_Increment expr_increment;
+non terminal Expression expr;
+non terminal ExpressionP exprP;
+non terminal Factor factor;
+non terminal Flag flags;
+non terminal for_statement;
+non terminal function_call;
+non terminal function_call_statement;
+//non terminal function_declaration;
+non terminal Function_Definition_List function_definition;
+non terminal If_Statement if_statement;
+non terminal Increment inc ;
+non terminal Increment_Special inc_special;
+non terminal IncrementI increment;
+non terminal IncrementP incrementP;
+non terminal arg_listP;
+non terminal init_for;
+non terminal init_forP;
+non terminal Jump_Statement jump_statement;
+non terminal Logical_Expression logical_expression;
+non terminal Logical_Operator logical_operators;
+non terminal Main_Function Main_Function;
+non terminal Param_Id param_id;
+non terminal Param_List param_list;
+non terminal Param_List_P param_listP;
+non terminal Param_Type_List param_type_list;
+non terminal Params params;
+non terminal PrintF printf_statement;
+non terminal Relational_Expression relational_expression;
+non terminal Relational_Operator relational_operators;
+//non terminal S;
+non terminal ScanF scanf_statement;
+non terminal Statement statement;
+non terminal Statement_Inside_If statement_inside_if;
+non terminal Statement_Inside_While statement_inside_while;
+non terminal Statement_List statement_list;
+non terminal Term term;
+non terminal TermP termP;
+non terminal Type type;
+non terminal Variable variable;
+non terminal Variable_Declaration variable_declaration ;
+non terminal Variable_Init variable_initialization;
+non terminal Variable_List variable_list;
+non terminal While_Statement while_statement;
+//S::= function_declaration S | Main_Function;
 
 
-programa ::= declaracion_funcion  programa                                    
-     | declaracion_variable programa                                         
-     | main 
-     ;
+Main_Function ::= INT MAIN PARENTESISIZQUIERDO params:p PARENTESISDERECHO LLAVEIZQUIERDA statement_list:sl RETURN expr PUNTOYCOMA LLAVEDERECHA function_definition:fdl {:RESULT = new Main_Function(fdl,p,sl);	:};
 
-main ::= tipo MAIN PARENTESISIZQUIERDO PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA;
+variable_declaration ::= type variable_list PUNTOYCOMA
+            |type error {: parser.report_error("variable_declarators" ,"ERROR"); :} PUNTOYCOMA
+            |type error
+            {: parser.report_error("variable_declarators" ,"WRONG"); :}
+            statement;
 
-codigos ::= codigo codigos;
-
-codigo ::= declaracion_variable                                                            
-         | asignacion_variable                                                             
-         | incrementarDecrementarVariable                                                 
-         | print                                                                            
-         | scans                                                                            
-         | _while                                                                          
-         | _if                                                                              
-         | _for                                                                            
-         | llamado_funcion PUNTOYCOMA                                                      
-         | operacion_aritmetica PUNTOYCOMA                                                                                                                                                                                                                                          
-         | CONSTCHAR PUNTOYCOMA                                                                                                                                                                                                                                                
-         | CONSTSTR PUNTOYCOMA  
-         | RETURN operacion_aritmetica PUNTOYCOMA
-         | RETURN CONSTCHAR PUNTOYCOMA
-         | RETURN CONSTSTR PUNTOYCOMA
-         | error codigo  
-         ;
-
-tipo ::= INT 
-       | CHAR   
-       | CHARPUNT
-       | INTPUNT
-       ;
-
-declaracion_variable ::= tipo declaracion_variables: PUNTOYCOMA;
-declaracion_variables ::= lista_variables COMA declaracion_variables
-                        | lista_variables;
-
-lista_variables ::= variable
-                |ID IGUAL operacion_aritmetica
-                |ID IGUAL CONSTCHAR
-                |ID IGUAL CONSTSTR
-                |ID CORCHETEIZQUIERDO operacion_aritmetica CORCHETEDERECHO IGUAL LLAVEIZQUIERDA inicializacion_arreglo LLAVEDERECHA
-                |ID CORCHETEIZQUIERDO CORCHETEDERECHO IGUAL LLAVEIZQUIERDA inicializacion_arreglo LLAVEDERECHA
-                ;
-
-inicializacion_arreglo_coma ::= COMA inicializacion_arreglo
-                            |;
-
-inicializacion_arreglo ::= operacion_aritmetica inicializacion_arreglo_coma
-                        | CONSTCHAR  inicializacion_arreglo_coma
-                        | CONSTSTR  inicializacion_arreglo_coma
-                        ;
-
-variable ::= ID
-            |elemento_array
-            ;
-
-elemento_array ::= ID CORCHETEIZQUIERDO operacion_aritmetica CORCHETEDERECHO;
-
-declaracion_funcion ::= tipo:t ID PARENTESISIZQUIERDO declaracion_funcion_parametros PARENTESISDERECHO PUNTOYCOMA
-                    |VOID ID PARENTESISIZQUIERDO declaracion_funcion_parametros PARENTESISDERECHO PUNTOYCOMA
-                    |error PUNTOYCOMA;
-
-declaracion_funcion_parametros ::= tipo declaracion_funcion_parametros_coma
-                    | tipo CORCHETEIZQUIERDO CORCHETEDERECHO declaracion_funcion_parametros_coma
-                    | tipo ID declaracion_funcion_parametros_coma
-                    | tipo ID CORCHETEIZQUIERDO CORCHETEDERECHO declaracion_funcion_parametros_coma;
-
-declaracion_funcion_parametros_coma ::= COMA declaracion_funcion_parametros;
+expr ::= term:t exprP:e					{:RESULT = new Expression(t,e);:};
+exprP ::= OPERADORSUMA term:t exprP:e                   {:RESULT = new OPlus(t,e);:}
+		| OPERADORRESTA term:t exprP:e		{:RESULT = new OMinus(t,e);:}
+		|
+		;
 
 
-funciones ::= tipo ID PARENTESISIZQUIERDO funciones_parametros PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
-            | VOID ID PARENTESISIZQUIERDO funciones_parametros PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
-            | tipo error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
-            | VOID error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
-            |;
+term ::= factor:f termP:t                               {:RESULT = new Term(f,t);:}
+		;
 
-funciones_parametros ::= tipo ID funciones_parametros_coma
-                        |;
+termP ::= OPERADORMULTIPLICACION factor:f termP:p            {:RESULT = new OMult(f,p);:}				
+		| OPERADORDIV factor:f termP:p 		{:RESULT = new OMult(f,p);:}
+		| 
+		;
 
-llamado_funcion ::= ID PARENTESISIZQUIERDO llamado_funcion_parametros PARENTESISDERECHO
-                    |ID error PARENTESISDERECHO;
+factor ::=variable:v 				{:RESULT = new Variable_To_Factor(v);:}	
+		| PARENTESISIZQUIERDO expr:e PARENTESISDERECHO		{:RESULT = new Factor_Expression(e);:}
+		| constant:c 				{:RESULT = c;:}					
+		| function_call ;
 
-llamado_funcion_parametros ::= operacion_aritmetica llamado_funcion_parametros_coma
-                | CONSTCHAR llamado_funcion_parametros_coma
-                | CONSTSTR llamado_funcion_parametros_coma
-                |;
+variable_list ::=   variable_list:list COMA variable_initialization:v               {:list.add_init(v); RESULT = list;:} 
+			| variable_initialization:v                                 {:RESULT = new Variable_List(v);:};
 
-llamado_funcion_parametros_coma ::= COMA llamado_funcion_parametros
-                |;
+variable ::= ID:id                                                                   {:RESULT = new Variable_Identifier(id);:}
+			|ID:id CORCHETEIZQUIERDO expr:e CORCHETEDERECHO     {:RESULT = new Variable_ArrayID(id,e);:}
+			;
+
+variable_initialization ::= variable_initialization:v IGUAL expr:e              {:RESULT = new Variable_Init_Expression(v,e);:}
+			| variable:v                                            {:RESULT = v;:} ;
+
+type ::= INT 							{:RESULT = new Type_Int();:}
+	| CHAR 							{:RESULT = new Type_Char();:}
+	| CHARPUNT						
+	| INTPUNT 						
+	;
+
+jump_statement ::= BREAK PUNTOYCOMA 		{:RESULT = new Jump_Break();:}
+				| RETURN PUNTOYCOMA 		{:RESULT = new Jump_Return();:}
+				| RETURN expr:e PUNTOYCOMA      {:RESULT = new Jump_Return_Expr(e);:};
+
+if_statement ::= IF PARENTESISIZQUIERDO boolean_expression:b PARENTESISDERECHO statement_inside_if:s {:RESULT = new If_Statement(b,s);:}
+				| IF error  {: parser.report_error("expression" ,"ERROR"); :} PARENTESISDERECHO statement_inside_if ;
+
+statement_list ::= statement_list:list statement:s          {:list.add(s); RESULT = list;:}
+				|                           {:RESULT = new Statement_List();:};
+
+statement::= if_statement:s 							{:RESULT = s;:}
+		| jump_statement:s                                              {:RESULT = s;:}
+		| assignment_statement:s 					{:RESULT = s;:}
+		| function_call_statement 
+		| for_statement
+		| variable_declaration:s 					{:RESULT = s;:}
+		| while_statement:s 						{:RESULT = s;:}
+		| printf_statement:s 						{:RESULT = s;:}
+		| scanf_statement:s 						{:RESULT = s;:};
+
+statement_inside_if ::= LLAVEIZQUIERDA statement_list:s LLAVEDERECHA     {:RESULT = new Statement_Inside_If_Simple(s);:}
+                        |LLAVEIZQUIERDA statement_list:s1 LLAVEDERECHA ELSE LLAVEIZQUIERDA statement_list:s2 LLAVEDERECHA  {:RESULT = new Statement_Inside_If_Complex(s1,s2);:};
+
+printf_statement ::= PRINTF PARENTESISIZQUIERDO CONSTSTR:c COMA expr:e PARENTESISDERECHO PUNTOYCOMA     {:RESULT = new PrintFExpr(e,c);:}
+				| PRINTF PARENTESISIZQUIERDO CONSTSTR:c PARENTESISDERECHO PUNTOYCOMA 	{:RESULT = new PrintFString(c);:};
+
+scanf_statement ::=  SCANF PARENTESISIZQUIERDO  flags:f COMA variable:v PARENTESISDERECHO PUNTOYCOMA    {:RESULT = new ScanF(f,v);:};
+
+flags ::= PERCENTAGEDIGIT        {:RESULT = new FlagD();:}
+	| PERCENTAGESTRING 	 {:RESULT = new FlagS();:}
+	| PERCENTAGECHART 	 {:RESULT = new FlagC();:};
+
+boolean_expression ::= relational_expression:rl logical_expression:le {:RESULT = new Boolean_Expression(rl,le);:};
+
+relational_expression ::=  expr:e1 relational_operators:r expr:e2 {:RESULT = new Relational_Expression(e1,e2,r);:}
+							| PARENTESISIZQUIERDO relational_expression:rl PARENTESISDERECHO {:RESULT = rl;:}
+							| error {: parser.report_error("relational_expression","ERROR"); :} 
+                                MENORQUE expr
+                              | error {: parser.report_error("relational_expression","ERROR"); :} 
+                                MAYORQUE expr
+                              | error  {: parser.report_error("relational_expression","ERROR"); :} 
+                                MENORIGUAL expr
+                              | error {: parser.report_error("relational_expression" ,"ERROR"); :} 
+                                MAYORIGUAL expr ;
+
+relational_operators ::=  MENORIGUAL      {:RESULT = new Operator_LTEQ();:}
+					| MENORQUE 			{:RESULT = new Operator_LT();:}
+					| MAYORQUE 			{:RESULT = new Operator_GT();:}
+					| MAYORIGUAL 			{:RESULT = new Operator_GTEQ();:}
+					| IGUALQUE 			{:RESULT = new Operator_EQEQ();:}
+					| NOTIGUAL			{:RESULT = new Operator_NOTEQ();:};
+
+logical_expression ::= logical_operators:lo boolean_expression:bo {:RESULT = new Logical_Expression(lo,bo);:}
+					|	{:RESULT = new Logical_Expression();:};
+
+logical_operators ::= ANDAND 		{:RESULT = new Logical_AND();:}
+					| OROR		{:RESULT = new Logical_OR();:}
+					;
+
+function_definition ::= type:t ID:id PARENTESISIZQUIERDO params:p PARENTESISDERECHO LLAVEIZQUIERDA statement_list:sl LLAVEDERECHA function_definition:list  {:list.add(new Function_Definition(t,p,sl)); RESULT = list;:}
+					|  {:RESULT = new Function_Definition_List();:}
+					;
+
+assignment_statement ::= assignment_expression:a PUNTOYCOMA		{:RESULT = new Assignment_Statement(a);:};
+
+assignment_expression ::= variable_initialization:v assignment_expressionP:a                            {:RESULT = new Assignment_Expression_Var_Init(v,a);:}
+						| expr_increment:e assignment_expressionP:a		{:RESULT = new Assignment_Expression_Increment(e,a);:}
+						;
+assignment_expressionP ::= variable_initialization:v assignment_expressionP:a                           {:RESULT = new Assignment_ExpressionP_Var(v,a);:}
+                            |{:RESULT = new Assignment_ExpressionP_Empty();:};
 
 
-scans ::= SCANF PARENTESISIZQUIERDO PARAMETROSCANF COMA ID PARENTESISDERECHO PUNTOYCOMA
-        | SCANF PARENTESISIZQUIERDO PARAMETROSCANF COMA elemento_array PARENTESISDERECHO PUNTOYCOMA;
+params ::= param_list:list                                              {:RESULT = new Params(list);:}
+		| {:RESULT = new Params();:};		
 
-print ::= PRINTF PARENTESISIZQUIERDO CONSTSTR PARENTESISDERECHO PUNTOYCOMA
-        | PRINTF PARENTESISIZQUIERDO CONSTSTR COMA operacion_aritmetica PARENTESISDERECHO PUNTOYCOMA;
+param_list ::= param_type_list:p param_listP:list 			{:list.add(p); RESULT = list;:}
+			| error 
+      {: parser.report_error("formal_parameter_list","ERROR"); :} 
+    COMA param_type_list param_listP;
 
+param_listP ::= COMA param_type_list:p param_listP:list	{:list.add(p); RESULT = list;:}
+			|			{:RESULT = new Param_List_P();:}
+			;
 
-_if ::= IF PARENTESISIZQUIERDO condicion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else
-        |IF error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else;
+param_type_list ::= type:t param_id:id 	{:RESULT = new Param_Type_List(t,id);:};
 
-else ::= ELSE IF PARENTESISIZQUIERDO condicion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else
-        |ELSE LLAVEIZQUIERDA codigos LLAVEDERECHA
-        |ELSE IF error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else
-        |;
+param_id ::= ID:id 							{:RESULT = new Param_Id_Identifier(id);:}
+		| ID:id CORCHETEIZQUIERDO CORCHETEDERECHO 		{:RESULT = new Param_Id_Array(id);:};
 
-_while ::= WHILE PARENTESISIZQUIERDO condicion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA
-                    | WHILE error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA;
+while_statement ::= WHILE PARENTESISIZQUIERDO boolean_expression:b PARENTESISDERECHO statement_inside_while:s {:RESULT = new While_Statement(b,s);:}
+			| WHILE error 
+      {: parser.report_error("expression" , "WRONG"); :}
+    PARENTESISDERECHO statement;
 
-_for ::= FOR PARENTESISIZQUIERDO for_inicializacion PUNTOYCOMA condicion PUNTOYCOMA for_actualizacion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA
-                | FOR error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA;
+statement_inside_while ::= LLAVEIZQUIERDA statement_list:sl LLAVEDERECHA    {:RESULT = new Statement_Inside_While(sl);:};
 
-for_inicializacion ::= tipo variable for_inicializacion_coma
-                      |tipo ID IGUAL operacion_aritmetica for_inicializacion_coma
-                      |tipo ID IGUAL CONSTCHAR for_inicializacion_coma
-                      |tipo ID IGUAL CONSTSTR for_inicializacion_coma
-                      |variable IGUAL operacion_aritmetica for_inicializacion_coma
-                      |variable OperARITMETICOIGUAL operacion_aritmetica for_inicializacion_coma 
-                      |variable IGUAL CONSTCHAR for_inicializacion_coma
-                      |variable IGUAL CONSTSTR for_inicializacion_coma;
+for_statement ::= FOR PARENTESISIZQUIERDO expr_for PARENTESISDERECHO LLAVEIZQUIERDA statement_list LLAVEDERECHA;
 
+expr_for ::= E1 PUNTOYCOMA E2 PUNTOYCOMA E3;
 
-for_inicializacion2 ::= variable IGUAL operacion_aritmetica for_inicializacion_coma
-                      | variable OperARITMETICOIGUAL operacion_aritmetica:o for_inicializacion_coma
-                      | variable IGUAL CONSTCHAR for_inicializacion_coma
-                      | variable IGUAL CONSTSTR for_inicializacion_coma;
+E1 ::= init_for| ;
+E2 ::= condition| ;
+E3 ::= increment| ;
 
-for_inicializacion_coma ::= COMA for_inicializacion2
-                        |;
+constant ::= CONSTCHAR:c {:RESULT = new Literal_Char(c);:}
+		| CONSTSTR:s 	{:RESULT = new Literal_String(s);:}
+		| NUM:i		{:RESULT = new Literal_Integer(i);:}
+		;
 
+init_for ::= INT assignment_expression init_forP
+			| assignment_expression
+			;
 
-for_actualizacion ::= variable IGUAL operacion_aritmetica for_actualizacion_coma
-                        | variable OperARITMETICOIGUAL operacion_aritmetica for_actualizacion_coma
-                        | variable IGUAL CONSTCHAR for_actualizacion_coma
-                        | variable IGUAL CONSTSTR for_actualizacion_coma;
+init_forP ::= COMA INT assignment_expression init_forP
+			| COMA assignment_expression
+			|
+			;
 
+condition ::= ID relational_operators expr conditionP;
+conditionP ::= COMA ID relational_operators expr conditionP
+			|
+			;
 
-for_actualizacion_coma ::= COMA for_actualizacion
-                        |;
+function_call ::= ID PARENTESISIZQUIERDO args PARENTESISDERECHO;
+function_call_statement ::= function_call PUNTOYCOMA;
 
-condicion ::= operacion_aritmetica OPERADORRELACIONAL operacion_aritmetica condicion_operador_logico
-             |operacion_aritmetica OPERADORRELACIONAL CONSTCHAR condicion_operador_logico
-             |operacion_aritmetica OPERADORRELACIONAL CONSTSTR condicion_operador_logico
-             |CONSTCHAR OPERADORRELACIONAL operacion_aritmetica condicion_operador_logico
-             |CONSTSTR OPERADORRELACIONAL operacion_aritmetica condicion_operador_logico
-             |PARENTESISIZQUIERDO condicion PARENTESISDERECHO condicion_operador_logico;
+increment ::= expr_increment:e incrementP:i {:RESULT = new IncrementI(e,i);:};
 
-condicion_operador_logico ::= OPERADORLOGICO condicion
-             |;
+incrementP ::= COMA expr_increment:e incrementP:i 		{:RESULT = new IncrementP_P(e,i);:}
+			|					{:RESULT = new IncrementP_Empty();:}
+			;
 
-asignacion_variable ::= variable: IGUAL operacion_aritmetica asignacion_variable_coma
-             | variable OperARITMETICOIGUAL operacion_aritmetica asignacion_variable_coma
-             | variable IGUAL CONSTCHAR asignacion_variable_coma
-             | variable IGUAL CONSTSTR asignacion_variable_coma
-             | error PUNTOYCOMA;
+expr_increment ::= variable:v inc:i 	{:RESULT = new Expression_Increment_VarInc(v,i);:} 
+				| inc_special:i variable:v {:RESULT = new Expression_Increment_Special_Variable(v,i);	:};
 
-asignacion_variable_coma ::= COMA asignacion_variable
-            |PUNTOYCOMA;
+inc ::= MENOSIGUAL expr:e  	{:RESULT = new Increment_MinEq(e);:}
+	| MENOSMENOS 		{:RESULT = new Increment_MinMin();:}
+	| MASIGUAL expr:e 	{:RESULT = new Increment_PlusEq(e);:} 
+	| MASMAS 			{:RESULT = new Increment_PlusPlus();:}
+	| DIVIGUAL expr:e 		 {:RESULT = new Increment_DivEq(e);:}
+	| MULTIIGUAL expr:e 	 {:RESULT = new Increment_MultEq(e);:};
 
-/*operacion_aritmetica ::= operacion_aritmetica: OPERADORSUMA operacion_aritmetica2
-                |operacion_aritmetica2;
+inc_special ::= MASMAS 	{:RESULT = new Increment_Special_PP();:}
+			| MENOSMENOS 	{:RESULT = new Increment_Special_MM();:};
 
-operacion_aritmetica2 ::= operacion_aritmetica2 OPERADORMULTIPLICACION operacion_aritmetica3
-                |operacion_aritmetica3;
+args::= arg_list 
+		| ;
 
-operacion_aritmetica3 ::= NUM
-                |variable    
-                |PARENTESISIZQUIERDO operacion_aritmetica PARENTESISDERECHO;*/
-                     
+arg_list ::= expr arg_listP 
+		;
+
+arg_listP ::= COMA expr arg_listP
+			|
+			;

@@ -21,7 +21,7 @@ public class main {
     static public void main(String argv[]){
         buildLexer();
         buildParser();
-        //runFile("input.txt");
+        //runFile("ejemplo1.cpp");
     }
 
     private static void buildParser() {
@@ -44,7 +44,7 @@ public class main {
     public static void buildLexer() {
         jflex.Main.generate(new File("src/proyecto_compi/lexer.flex"));
     }
-/*
+
     private static void runFile(String file) {
         try {
             parser parser = new parser(new lexer(new FileReader(file)));
@@ -56,5 +56,5 @@ public class main {
         }
 
         
-    }*/
+    }
 }
