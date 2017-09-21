@@ -12,6 +12,15 @@ parser code
         //report_fatal_error("Fatal Error: " + s.value, null);
         }
 
+       /* public void syntax_error(Symbol s)
+    {
+        Token t = (Token)s.value;
+        report_error("Se ha encontrado un error sintactico en linea " + t.getLinea() + ", columna " + t.getColumna() + " -> No se esperaba un < " + t.getContenido() + " >", null);
+
+        errores++;
+    }*/
+
+
 :}
 
 /* Terminals Tokens */
