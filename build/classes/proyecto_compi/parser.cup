@@ -1,15 +1,277 @@
 package proyecto_compi;
+import java.io.*;
+import java_cup.runtime.*; 
 
-import java_cup.runtime.*;
+parser code
+{:
+	public void syntax_error(Symbol s){
+		report_error("Error de sintaxis. Linea: " + (s.right + 1) +
+		" Columna: " + s.left + ". Texto: \"" + s.value + "\"", null);
+	}
+        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+        //report_fatal_error("Fatal Error: " + s.value, null);
+        }
 
-terminal Integer INT;
-terminal Character CHAR;
-terminal String NUM;
-terminal FOR, IF, ELSE, WHILE, RETURN, MAIN, PRINTF, SCANF;
+:}
 
-non terminal Integer E, T, F;
-non terminal S;
+/* Terminals Tokens */
 
-S ::= E:e			{:System.out.println(e);:};
-E ::= E:e MAS T:t               {:RESULT = e + t;:};
-F ::= NUM:n			{:RESULT = new Integer(n);:};
+
+
+terminal INT, CHAR, INTPUNT, CHARPUNT;
+
+terminal ID;
+terminal IF;
+terminal ELSE;
+terminal WHILE;
+terminal FOR;
+terminal TRUE;
+terminal FALSE;
+terminal MAIN; 
+terminal RETURN; 
+terminal VOID; 
+terminal CORCHETEIZQUIERDO; 
+terminal CORCHETEDERECHO;
+terminal LLAVEIZQUIERDA;
+terminal LLAVEDERECHA;
+terminal CONSTCHAR CONSTCHAR; 
+terminal CONSTSTR CONSTSTR;
+terminal PARENTESISIZQUIERDO; 
+terminal PARENTESISDERECHO;
+terminal IGUAL;
+terminal PUNTO;
+terminal NOT;
+terminal PRINTF;
+terminal SCANF;
+terminal PERCENTAGE;
+terminal PERCENTAGEDIGIT;
+terminal PERCENTAGESTRING;
+terminal NUM;
+terminal OperARITMETICOIGUAL;
+terminal OPERADORSUMA;
+terminal OPERADORMULTIPLICACION; 
+terminal MODASIGNACION;  
+terminal OPERADORRELACIONAL;
+terminal MODARITMETICO;
+terminal INTERROGACION;
+terminal OPERADORLOGICO;
+terminal PUNTOYCOMA;
+terminal COMA;
+terminal DOSPUNTOS;
+terminal PARAMETROSCANF;
+terminal AND;
+terminal IMPORT;
+
+non terminal programa;
+non terminal main;
+non terminal codigo;
+non terminal declaracion_funcion;
+non terminal operacion_aritmetica;
+non terminal operacion_aritmetica2;
+non terminal operacion_aritmetica3;
+non terminal declaracion_variable;
+non terminal tipo;
+non terminal variable;
+non terminal elemento_array;
+non terminal asignacion_variable_coma;
+non terminal asignacion_variable;
+non terminal IncrementarDecrementarVariable incrementarDecrementarVariable;
+non terminal scans;
+non terminal print;
+non terminal _if;
+non terminal else;
+non terminal _while;
+non terminal _for;
+non terminal for_inicializacion;
+non terminal for_inicializacion2;
+non terminal for_actualizacion;
+non terminal for_actualizacion_coma; 
+non terminal lista_variables;
+non terminal for_inicializacion_coma;
+non terminal condicion;
+non terminal condicion_operador_logico;
+non terminal inicializacion_arreglo;
+non terminal inicializacion_arreglo_coma;
+non terminal declaracion_funcion_parametros;
+non terminal declaracion_funcion_parametros_coma;
+non terminal funciones;
+non terminal funciones_parametros;
+non terminal funciones_parametros_coma;
+non terminal llamado_funcion;
+non terminal llamado_funcion_parametros;
+non terminal llamado_funcion_parametros_coma;
+non terminal Return;
+non terminal codigos;
+non terminal declaracion_variables;
+
+
+programa ::= declaracion_funcion  programa                                    
+     | declaracion_variable programa                                         
+     | main 
+     ;
+
+main ::= tipo MAIN PARENTESISIZQUIERDO PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA;
+
+codigos ::= codigo codigos;
+
+codigo ::= declaracion_variable                                                            
+         | asignacion_variable                                                             
+         | incrementarDecrementarVariable                                                 
+         | print                                                                            
+         | scans                                                                            
+         | _while                                                                          
+         | _if                                                                              
+         | _for                                                                            
+         | llamado_funcion PUNTOYCOMA                                                      
+         | operacion_aritmetica PUNTOYCOMA                                                                                                                                                                                                                                          
+         | CONSTCHAR PUNTOYCOMA                                                                                                                                                                                                                                                
+         | CONSTSTR PUNTOYCOMA  
+         | RETURN operacion_aritmetica PUNTOYCOMA
+         | RETURN CONSTCHAR PUNTOYCOMA
+         | RETURN CONSTSTR PUNTOYCOMA
+         | error codigo  
+         ;
+
+tipo ::= INT 
+       | CHAR   
+       | CHARPUNT
+       | INTPUNT
+       ;
+
+declaracion_variable ::= tipo declaracion_variables: PUNTOYCOMA;
+declaracion_variables ::= lista_variables COMA declaracion_variables
+                        | lista_variables;
+
+lista_variables ::= variable
+                |ID IGUAL operacion_aritmetica
+                |ID IGUAL CONSTCHAR
+                |ID IGUAL CONSTSTR
+                |ID CORCHETEIZQUIERDO operacion_aritmetica CORCHETEDERECHO IGUAL LLAVEIZQUIERDA inicializacion_arreglo LLAVEDERECHA
+                |ID CORCHETEIZQUIERDO CORCHETEDERECHO IGUAL LLAVEIZQUIERDA inicializacion_arreglo LLAVEDERECHA
+                ;
+
+inicializacion_arreglo_coma ::= COMA inicializacion_arreglo
+                            |;
+
+inicializacion_arreglo ::= operacion_aritmetica inicializacion_arreglo_coma
+                        | CONSTCHAR  inicializacion_arreglo_coma
+                        | CONSTSTR  inicializacion_arreglo_coma
+                        ;
+
+variable ::= ID
+            |elemento_array
+            ;
+
+elemento_array ::= ID CORCHETEIZQUIERDO operacion_aritmetica CORCHETEDERECHO;
+
+declaracion_funcion ::= tipo:t ID PARENTESISIZQUIERDO declaracion_funcion_parametros PARENTESISDERECHO PUNTOYCOMA
+                    |VOID ID PARENTESISIZQUIERDO declaracion_funcion_parametros PARENTESISDERECHO PUNTOYCOMA
+                    |error PUNTOYCOMA;
+
+declaracion_funcion_parametros ::= tipo declaracion_funcion_parametros_coma
+                    | tipo CORCHETEIZQUIERDO CORCHETEDERECHO declaracion_funcion_parametros_coma
+                    | tipo ID declaracion_funcion_parametros_coma
+                    | tipo ID CORCHETEIZQUIERDO CORCHETEDERECHO declaracion_funcion_parametros_coma;
+
+declaracion_funcion_parametros_coma ::= COMA declaracion_funcion_parametros;
+
+
+funciones ::= tipo ID PARENTESISIZQUIERDO funciones_parametros PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
+            | VOID ID PARENTESISIZQUIERDO funciones_parametros PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
+            | tipo error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
+            | VOID error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA funciones
+            |;
+
+funciones_parametros ::= tipo ID funciones_parametros_coma
+                        |;
+
+llamado_funcion ::= ID PARENTESISIZQUIERDO llamado_funcion_parametros PARENTESISDERECHO
+                    |ID error PARENTESISDERECHO;
+
+llamado_funcion_parametros ::= operacion_aritmetica llamado_funcion_parametros_coma
+                | CONSTCHAR llamado_funcion_parametros_coma
+                | CONSTSTR llamado_funcion_parametros_coma
+                |;
+
+llamado_funcion_parametros_coma ::= COMA llamado_funcion_parametros
+                |;
+
+
+scans ::= SCANF PARENTESISIZQUIERDO PARAMETROSCANF COMA ID PARENTESISDERECHO PUNTOYCOMA
+        | SCANF PARENTESISIZQUIERDO PARAMETROSCANF COMA elemento_array PARENTESISDERECHO PUNTOYCOMA;
+
+print ::= PRINTF PARENTESISIZQUIERDO CONSTSTR PARENTESISDERECHO PUNTOYCOMA
+        | PRINTF PARENTESISIZQUIERDO CONSTSTR COMA operacion_aritmetica PARENTESISDERECHO PUNTOYCOMA;
+
+
+_if ::= IF PARENTESISIZQUIERDO condicion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else
+        |IF error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else;
+
+else ::= ELSE IF PARENTESISIZQUIERDO condicion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else
+        |ELSE LLAVEIZQUIERDA codigos LLAVEDERECHA
+        |ELSE IF error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA else
+        |;
+
+_while ::= WHILE PARENTESISIZQUIERDO condicion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA
+                    | WHILE error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA;
+
+_for ::= FOR PARENTESISIZQUIERDO for_inicializacion PUNTOYCOMA condicion PUNTOYCOMA for_actualizacion PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA
+                | FOR error PARENTESISDERECHO LLAVEIZQUIERDA codigos LLAVEDERECHA;
+
+for_inicializacion ::= tipo variable for_inicializacion_coma
+                      |tipo ID IGUAL operacion_aritmetica for_inicializacion_coma
+                      |tipo ID IGUAL CONSTCHAR for_inicializacion_coma
+                      |tipo ID IGUAL CONSTSTR for_inicializacion_coma
+                      |variable IGUAL operacion_aritmetica for_inicializacion_coma
+                      |variable OperARITMETICOIGUAL operacion_aritmetica for_inicializacion_coma 
+                      |variable IGUAL CONSTCHAR for_inicializacion_coma
+                      |variable IGUAL CONSTSTR for_inicializacion_coma;
+
+
+for_inicializacion2 ::= variable IGUAL operacion_aritmetica for_inicializacion_coma
+                      | variable OperARITMETICOIGUAL operacion_aritmetica:o for_inicializacion_coma
+                      | variable IGUAL CONSTCHAR for_inicializacion_coma
+                      | variable IGUAL CONSTSTR for_inicializacion_coma;
+
+for_inicializacion_coma ::= COMA for_inicializacion2
+                        |;
+
+
+for_actualizacion ::= variable IGUAL operacion_aritmetica for_actualizacion_coma
+                        | variable OperARITMETICOIGUAL operacion_aritmetica for_actualizacion_coma
+                        | variable IGUAL CONSTCHAR for_actualizacion_coma
+                        | variable IGUAL CONSTSTR for_actualizacion_coma;
+
+
+for_actualizacion_coma ::= COMA for_actualizacion
+                        |;
+
+condicion ::= operacion_aritmetica OPERADORRELACIONAL operacion_aritmetica condicion_operador_logico
+             |operacion_aritmetica OPERADORRELACIONAL CONSTCHAR condicion_operador_logico
+             |operacion_aritmetica OPERADORRELACIONAL CONSTSTR condicion_operador_logico
+             |CONSTCHAR OPERADORRELACIONAL operacion_aritmetica condicion_operador_logico
+             |CONSTSTR OPERADORRELACIONAL operacion_aritmetica condicion_operador_logico
+             |PARENTESISIZQUIERDO condicion PARENTESISDERECHO condicion_operador_logico;
+
+condicion_operador_logico ::= OPERADORLOGICO condicion
+             |;
+
+asignacion_variable ::= variable: IGUAL operacion_aritmetica asignacion_variable_coma
+             | variable OperARITMETICOIGUAL operacion_aritmetica asignacion_variable_coma
+             | variable IGUAL CONSTCHAR asignacion_variable_coma
+             | variable IGUAL CONSTSTR asignacion_variable_coma
+             | error PUNTOYCOMA;
+
+asignacion_variable_coma ::= COMA asignacion_variable
+            |PUNTOYCOMA;
+
+/*operacion_aritmetica ::= operacion_aritmetica: OPERADORSUMA operacion_aritmetica2
+                |operacion_aritmetica2;
+
+operacion_aritmetica2 ::= operacion_aritmetica2 OPERADORMULTIPLICACION operacion_aritmetica3
+                |operacion_aritmetica3;
+
+operacion_aritmetica3 ::= NUM
+                |variable    
+                |PARENTESISIZQUIERDO operacion_aritmetica PARENTESISDERECHO;*/
+                     
