@@ -10,6 +10,10 @@ parser code
 		report_error("Error de sintaxis. Linea: " + (s.right + 1) +
 		" Columna: " + s.left + ". Texto: \"" + s.value + "\"", null);
 	}
+        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
+        {
+         //report_fatal_error("Fatal Error: " + s.value, null);
+        }
        
 
 
@@ -39,11 +43,8 @@ terminal String CONSTSTR;
 terminal PARENTESISIZQUIERDO; 
 terminal PARENTESISDERECHO;
 terminal IGUAL;
-terminal PUNTO;
-terminal NOT;
 terminal PRINTF;
 terminal SCANF;
-terminal PERCENTAGE;
 terminal PERCENTAGEDIGIT;
 terminal PERCENTAGESTRING;
 terminal PERCENTAGECHART;
@@ -58,24 +59,17 @@ terminal MENOSMENOS;
 terminal MASIGUAL;
 terminal MENOSIGUAL;
 terminal MULTIIGUAL;
-terminal DIVIGUAL;
-terminal MODASIGNACION;  
+terminal DIVIGUAL;  
 terminal MENORQUE;
 terminal MAYORQUE;
 terminal MAYORIGUAL;
 terminal MENORIGUAL;
 terminal NOTIGUAL;
 terminal IGUALQUE;
-terminal MODARITMETICO;
-terminal INTERROGACION;
 terminal ANDAND;
 terminal OROR;
 terminal PUNTOYCOMA;
 terminal COMA;
-terminal DOSPUNTOS;
-terminal PARAMETROSCANF;
-terminal AND;
-terminal IMPORT;
 
 non terminal arg_list;
 non terminal args;
@@ -98,7 +92,6 @@ non terminal flags;
 non terminal for_statement;
 non terminal function_call;
 non terminal function_call_statement;
-
 non terminal function_definition;
 non terminal if_statement;
 non terminal inc ;
@@ -120,7 +113,6 @@ non terminal params;
 non terminal printf_statement;
 non terminal relational_expression;
 non terminal relational_operators;
-
 non terminal scanf_statement;
 non terminal statement;
 non terminal statement_inside_if;
@@ -147,25 +139,6 @@ variable_declaration ::= type variable_list PUNTOYCOMA
             {: parser.report_error("variable_declarators" ,"ERROR"); :}
             statement;
 
-expr ::= term:t exprP:e;				
-exprP ::= OPERADORSUMA term:t exprP:e                   
-		| OPERADORRESTA term:t exprP:e		
-		|
-		;
-
-
-term ::= factor:f termP:t                               
-		;
-
-termP ::= OPERADORMULTIPLICACION factor:f termP:p            				
-		| OPERADORDIV factor:f termP:p 		
-		| 
-		;
-
-factor ::=variable:v 					
-		| PARENTESISIZQUIERDO expr:e PARENTESISDERECHO		
-		| constant:c 									
-		| function_call ;
 
 variable_list ::=   variable_list:list COMA variable_initialization:v                
 			| variable_initialization:v   ;                              
@@ -209,8 +182,10 @@ statement_inside_if ::= LLAVEIZQUIERDA statement_list:s LLAVEDERECHA
 
 printf_statement ::= PRINTF PARENTESISIZQUIERDO CONSTSTR:c COMA expr:e PARENTESISDERECHO PUNTOYCOMA     
 				| PRINTF PARENTESISIZQUIERDO CONSTSTR:c PARENTESISDERECHO PUNTOYCOMA;
+                                
 
-scanf_statement ::=  SCANF PARENTESISIZQUIERDO  flags:f COMA variable:v PARENTESISDERECHO PUNTOYCOMA;
+scanf_statement ::=  SCANF PARENTESISIZQUIERDO  flags:f COMA variable:v PARENTESISDERECHO PUNTOYCOMA
+                    |error {: parser.report_error("scanf_statement","ERROR"); :};
 
 flags ::= PERCENTAGEDIGIT        
 	| PERCENTAGESTRING 	 
@@ -310,6 +285,26 @@ conditionP ::= COMA ID relational_operators expr conditionP
 
 function_call ::= ID PARENTESISIZQUIERDO args PARENTESISDERECHO;
 function_call_statement ::= function_call PUNTOYCOMA;
+
+expr ::= term:t exprP:e;				
+exprP ::= OPERADORSUMA term:t exprP:e                   
+		| OPERADORRESTA term:t exprP:e		
+		|
+		;
+
+
+term ::= factor:f termP:t                               
+		;
+
+termP ::= OPERADORMULTIPLICACION factor:f termP:p            				
+		| OPERADORDIV factor:f termP:p 		
+		| 
+		;
+
+factor ::=variable:v 					
+		| PARENTESISIZQUIERDO expr:e PARENTESISDERECHO		
+		| constant:c 									
+		| function_call ;
 
 increment ::= expr_increment:e incrementP:i;
 

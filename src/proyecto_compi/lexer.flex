@@ -28,7 +28,6 @@ Ignore              = {LineTerminator}|{Tab}|{WhiteSpace}|{Comments}
 MultiLineComment    = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 LineComment         = "//" {InputCharacter}* {LineTerminator}?
 Comments            = {LineComment} | {MultiLineComment}
-Percentage          = "%%"
 ID                  = [a-zA-Z][[a-zA-Z]|[0-9]|"_"]*
 constChar           = '[a-zA-Z]'
 constStr            = \" [[\w]|[\d]|[\s]|[\\n]|[\\t]|[\\r]|[:]|[=]|[!]|[%d]|[%c]|[%s]|[%i]|[(]|[)]|[+]|[-]|[*]|[/]|[?]|[>]|[<]|[,]|[_]]* \"
@@ -73,7 +72,6 @@ While               = while
 AND                 = &
 For                 = for
 If                  = if
-Import              = import
 break               = break
 
 %%
@@ -84,16 +82,11 @@ break               = break
 	{While}			{return new Symbol(sym.WHILE, yyline + 1, yycolumn + 1, yytext());}
 	{Return}		{return new Symbol(sym.RETURN,  yyline + 1, yycolumn + 1, yytext());}
 	{Main}			{return new Symbol(sym.MAIN,  yyline + 1, yycolumn + 1, yytext());}
-        {Import}                {return new Symbol(sym.IMPORT,  yyline + 1, yycolumn + 1, yytext());}
         {break}                 {return new Symbol(sym.BREAK,  yyline + 1, yycolumn + 1, yytext());}
-        "."                     {return new Symbol(sym.PUNTO,  yyline + 1, yycolumn + 1, yytext());}
 	{Printf}		{return new Symbol(sym.PRINTF,  yyline + 1, yycolumn + 1, yytext());}
-	{Scanf}			{return new Symbol(sym.SCANF,  yyline + 1, yycolumn + 1, yytext());}
-	"!"                     {return new Symbol(sym.NOT,  yyline + 1, yycolumn + 1, yytext());}
-        {AND}                   {return new Symbol(sym.AND,  yyline + 1, yycolumn + 1, yytext());}
+	{Scanf}			{return new Symbol(sym.SCANF,  yyline + 1, yycolumn + 1, yytext());}	
 	{Igual}			{return new Symbol(sym.IGUAL,  yyline + 1, yycolumn + 1, yytext());}
 	{MASMAS}                {return new Symbol(sym.MASMAS,  yyline + 1, yycolumn + 1, yytext());}
-	"%="			{return new Symbol(sym.MODASIGNACION,  yyline + 1, yycolumn + 1, yytext());}
 	{ANDAND}                {return new Symbol(sym.ANDAND,  yyline + 1, yycolumn + 1, yytext());}
         {OROR}                  {return new Symbol(sym.OROR,  yyline + 1, yycolumn + 1, yytext());}
 	{MENORQUE}              {return new Symbol(sym.MENORQUE,  yyline + 1, yycolumn + 1, yytext());}
@@ -111,13 +104,11 @@ break               = break
         {DIVIGUAL}              {return new Symbol(sym.DIVIGUAL,  yyline + 1, yycolumn + 1, yytext());}
 	{OPMULT}		{return new Symbol(sym.OPERADORMULTIPLICACION,  yyline + 1, yycolumn + 1, yytext());}
         {OPERADORDIV}           {return new Symbol(sym.OPERADORDIV,  yyline + 1, yycolumn + 1, yytext());}
-	"%"			{return new Symbol(sym.MODARITMETICO,  yyline + 1, yycolumn + 1, yytext());}
 	{PuntoYComa}		{return new Symbol(sym.PUNTOYCOMA,  yyline + 1, yycolumn + 1, yytext());}
         {Void}                  {return new Symbol(sym.VOID,  yyline + 1, yycolumn + 1, yytext());}
 	{CorcheteIzquierdo}	{return new Symbol(sym.CORCHETEIZQUIERDO,  yyline + 1, yycolumn + 1, yytext());}
 	{CorcheteDerecho}	{return new Symbol(sym.CORCHETEDERECHO,  yyline + 1, yycolumn + 1, yytext());}
 	{Coma}			{return new Symbol(sym.COMA,  yyline + 1, yycolumn + 1, yytext());}
-	":"			{return new Symbol(sym.DOSPUNTOS,  yyline + 1, yycolumn + 1, yytext());}
 	{LlaveIzquierda}	{return new Symbol(sym.LLAVEIZQUIERDA,  yyline + 1, yycolumn + 1, yytext());}
 	{LlaveDerecha}		{return new Symbol(sym.LLAVEDERECHA,  yyline + 1, yycolumn + 1, yytext());}
 	{ParentesisIzquierdo}	{return new Symbol(sym.PARENTESISIZQUIERDO,  yyline + 1, yycolumn + 1, yytext());}
@@ -127,7 +118,6 @@ break               = break
 	{Int}			{return new Symbol(sym.INT,  yyline + 1, yycolumn + 1, yytext());}
 	{Char}			{return new Symbol(sym.CHAR,  yyline + 1, yycolumn + 1, yytext());}
 	{intpunt}		{return new Symbol(sym.INTPUNT,  yyline + 1, yycolumn + 1, yytext());}
-	{Percentage}            {return new Symbol(sym.PERCENTAGE,  yyline + 1, yycolumn + 1, yytext());}
 	"%d"            	{return new Symbol(sym.PERCENTAGEDIGIT,  yyline + 1, yycolumn + 1, yytext());}
 	"%s"                    {return new Symbol(sym.PERCENTAGESTRING,  yyline + 1, yycolumn + 1, yytext());}
         "%c"                    {return new Symbol(sym.PERCENTAGECHART,  yyline + 1, yycolumn + 1, yytext());}
