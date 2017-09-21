@@ -21,7 +21,7 @@ public class main {
     static public void main(String argv[]){
         buildLexer();
         buildParser();
-        //runFile("ejemplo1.cpp");
+        runFile("ejemplo1.cpp");
     }
 
     private static void buildParser() {

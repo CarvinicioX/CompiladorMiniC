@@ -29,9 +29,6 @@ MultiLineComment    = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 LineComment         = "//" {InputCharacter}* {LineTerminator}?
 Comments            = {LineComment} | {MultiLineComment}
 Percentage          = "%%"
-PERCENTAGEDIGIT     = ("\"%d"\")
-PERCENTAGESTRING    = "%s"
-PERCENTAGECHART     = "%c"
 ID                  = [a-zA-Z][[a-zA-Z]|[0-9]|"_"]*
 constChar           = '[a-zA-Z]'
 constStr            = \" [[\w]|[\d]|[\s]|[\\n]|[\\t]|[\\r]|[:]|[=]|[!]|[%d]|[%c]|[%s]|[%i]|[(]|[)]|[+]|[-]|[*]|[/]|[?]|[>]|[<]|[,]|[_]]* \"
@@ -131,9 +128,9 @@ break               = break
 	{Char}			{return new Symbol(sym.CHAR,  yyline + 1, yycolumn + 1, yytext());}
 	{intpunt}		{return new Symbol(sym.INTPUNT,  yyline + 1, yycolumn + 1, yytext());}
 	{Percentage}            {return new Symbol(sym.PERCENTAGE,  yyline + 1, yycolumn + 1, yytext());}
-	{PERCENTAGEDIGIT}	{return new Symbol(sym.PERCENTAGEDIGIT,  yyline + 1, yycolumn + 1, yytext());}
-	{PERCENTAGESTRING}	{return new Symbol(sym.PERCENTAGESTRING,  yyline + 1, yycolumn + 1, yytext());}
-        {PERCENTAGECHART}       {return new Symbol(sym.PERCENTAGECHART,  yyline + 1, yycolumn + 1, yytext());}
+	"%d"            	{return new Symbol(sym.PERCENTAGEDIGIT,  yyline + 1, yycolumn + 1, yytext());}
+	"%s"                    {return new Symbol(sym.PERCENTAGESTRING,  yyline + 1, yycolumn + 1, yytext());}
+        "%c"                    {return new Symbol(sym.PERCENTAGECHART,  yyline + 1, yycolumn + 1, yytext());}
 	{charpunt}		{return new Symbol(sym.CHARPUNT,  yyline + 1, yycolumn + 1, yytext());}
 	{ID}			{return new Symbol(sym.ID,  yyline + 1, yycolumn + 1, yytext());}
 	{Num}			{return new Symbol(sym.NUM,  yyline + 1, yycolumn + 1, yytext());}      

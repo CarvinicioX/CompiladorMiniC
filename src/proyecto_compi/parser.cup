@@ -1,7 +1,7 @@
 package proyecto_compi;
 import java.io.*;
 import java_cup.runtime.*;
-import AST.*; 
+ 
 
 
 parser code
@@ -79,144 +79,148 @@ terminal IMPORT;
 
 non terminal arg_list;
 non terminal args;
-non terminal Assignment_Expression assignment_expression;
-non terminal Assignment_ExpressionP assignment_expressionP;
-non terminal Assignment_Statement assignment_statement;
-non terminal Boolean_Expression boolean_expression;
+non terminal assignment_expression;
+non terminal assignment_expressionP;
+non terminal assignment_statement;
+non terminal boolean_expression;
 non terminal condition;
 non terminal conditionP;
-non terminal Constant constant;
+non terminal constant;
 non terminal E1;
 non terminal E2;
 non terminal E3;
 non terminal expr_for;
-non terminal Expression_Increment expr_increment;
-non terminal Expression expr;
-non terminal ExpressionP exprP;
-non terminal Factor factor;
-non terminal Flag flags;
+non terminal expr_increment;
+non terminal expr;
+non terminal exprP;
+non terminal factor;
+non terminal flags;
 non terminal for_statement;
 non terminal function_call;
 non terminal function_call_statement;
-//non terminal function_declaration;
-non terminal Function_Definition_List function_definition;
-non terminal If_Statement if_statement;
-non terminal Increment inc ;
-non terminal Increment_Special inc_special;
-non terminal IncrementI increment;
-non terminal IncrementP incrementP;
+
+non terminal function_definition;
+non terminal if_statement;
+non terminal inc ;
+non terminal inc_special;
+non terminal increment;
+non terminal incrementP;
 non terminal arg_listP;
 non terminal init_for;
 non terminal init_forP;
-non terminal Jump_Statement jump_statement;
-non terminal Logical_Expression logical_expression;
-non terminal Logical_Operator logical_operators;
-non terminal Main_Function Main_Function;
-non terminal Param_Id param_id;
-non terminal Param_List param_list;
-non terminal Param_List_P param_listP;
-non terminal Param_Type_List param_type_list;
-non terminal Params params;
-non terminal PrintF printf_statement;
-non terminal Relational_Expression relational_expression;
-non terminal Relational_Operator relational_operators;
-//non terminal S;
-non terminal ScanF scanf_statement;
-non terminal Statement statement;
-non terminal Statement_Inside_If statement_inside_if;
-non terminal Statement_Inside_While statement_inside_while;
-non terminal Statement_List statement_list;
-non terminal Term term;
-non terminal TermP termP;
-non terminal Type type;
-non terminal Variable variable;
-non terminal Variable_Declaration variable_declaration ;
-non terminal Variable_Init variable_initialization;
-non terminal Variable_List variable_list;
-non terminal While_Statement while_statement;
-//S::= function_declaration S | Main_Function;
+non terminal jump_statement;
+non terminal logical_expression;
+non terminal logical_operators;
+non terminal Main_Function;
+non terminal param_id;
+non terminal param_list;
+non terminal param_listP;
+non terminal param_type_list;
+non terminal params;
+non terminal printf_statement;
+non terminal relational_expression;
+non terminal relational_operators;
+
+non terminal scanf_statement;
+non terminal statement;
+non terminal statement_inside_if;
+non terminal statement_inside_while;
+non terminal statement_list;
+non terminal term;
+non terminal termP;
+non terminal type;
+non terminal variable;
+non terminal variable_declaration ;
+non terminal variable_initialization;
+non terminal variable_list;
+non terminal while_statement;
 
 
-Main_Function ::= INT MAIN PARENTESISIZQUIERDO params:p PARENTESISDERECHO LLAVEIZQUIERDA statement_list:sl RETURN expr PUNTOYCOMA LLAVEDERECHA function_definition:fdl {:RESULT = new Main_Function(fdl,p,sl);	:};
+
+Main_Function ::= INT MAIN PARENTESISIZQUIERDO params:p PARENTESISDERECHO LLAVEIZQUIERDA statement_list:sl RETURN expr PUNTOYCOMA LLAVEDERECHA function_definition:fdl
+                ;
+
 
 variable_declaration ::= type variable_list PUNTOYCOMA
             |type error {: parser.report_error("variable_declarators" ,"ERROR"); :} PUNTOYCOMA
             |type error
-            {: parser.report_error("variable_declarators" ,"WRONG"); :}
+            {: parser.report_error("variable_declarators" ,"ERROR"); :}
             statement;
 
-expr ::= term:t exprP:e					{:RESULT = new Expression(t,e);:};
-exprP ::= OPERADORSUMA term:t exprP:e                   {:RESULT = new OPlus(t,e);:}
-		| OPERADORRESTA term:t exprP:e		{:RESULT = new OMinus(t,e);:}
+expr ::= term:t exprP:e;				
+exprP ::= OPERADORSUMA term:t exprP:e                   
+		| OPERADORRESTA term:t exprP:e		
 		|
 		;
 
 
-term ::= factor:f termP:t                               {:RESULT = new Term(f,t);:}
+term ::= factor:f termP:t                               
 		;
 
-termP ::= OPERADORMULTIPLICACION factor:f termP:p            {:RESULT = new OMult(f,p);:}				
-		| OPERADORDIV factor:f termP:p 		{:RESULT = new OMult(f,p);:}
+termP ::= OPERADORMULTIPLICACION factor:f termP:p            				
+		| OPERADORDIV factor:f termP:p 		
 		| 
 		;
 
-factor ::=variable:v 				{:RESULT = new Variable_To_Factor(v);:}	
-		| PARENTESISIZQUIERDO expr:e PARENTESISDERECHO		{:RESULT = new Factor_Expression(e);:}
-		| constant:c 				{:RESULT = c;:}					
+factor ::=variable:v 					
+		| PARENTESISIZQUIERDO expr:e PARENTESISDERECHO		
+		| constant:c 									
 		| function_call ;
 
-variable_list ::=   variable_list:list COMA variable_initialization:v               {:list.add_init(v); RESULT = list;:} 
-			| variable_initialization:v                                 {:RESULT = new Variable_List(v);:};
+variable_list ::=   variable_list:list COMA variable_initialization:v                
+			| variable_initialization:v   ;                              
 
-variable ::= ID:id                                                                   {:RESULT = new Variable_Identifier(id);:}
-			|ID:id CORCHETEIZQUIERDO expr:e CORCHETEDERECHO     {:RESULT = new Variable_ArrayID(id,e);:}
+variable ::= ID:id                                                                   
+			|ID:id CORCHETEIZQUIERDO expr:e CORCHETEDERECHO     
 			;
 
-variable_initialization ::= variable_initialization:v IGUAL expr:e              {:RESULT = new Variable_Init_Expression(v,e);:}
-			| variable:v                                            {:RESULT = v;:} ;
+variable_initialization ::= variable_initialization:v IGUAL expr:e              
+			| variable:v                                             ;
 
-type ::= INT 							{:RESULT = new Type_Int();:}
-	| CHAR 							{:RESULT = new Type_Char();:}
+type ::= INT 							
+	| CHAR 							
 	| CHARPUNT						
-	| INTPUNT 						
+	| INTPUNT
+        | VOID
 	;
 
-jump_statement ::= BREAK PUNTOYCOMA 		{:RESULT = new Jump_Break();:}
-				| RETURN PUNTOYCOMA 		{:RESULT = new Jump_Return();:}
-				| RETURN expr:e PUNTOYCOMA      {:RESULT = new Jump_Return_Expr(e);:};
+jump_statement ::= BREAK PUNTOYCOMA 		
+				| RETURN PUNTOYCOMA 		
+				| RETURN expr:e PUNTOYCOMA      ;
 
-if_statement ::= IF PARENTESISIZQUIERDO boolean_expression:b PARENTESISDERECHO statement_inside_if:s {:RESULT = new If_Statement(b,s);:}
+if_statement ::= IF PARENTESISIZQUIERDO boolean_expression:b PARENTESISDERECHO statement_inside_if:s 
 				| IF error  {: parser.report_error("expression" ,"ERROR"); :} PARENTESISDERECHO statement_inside_if ;
 
-statement_list ::= statement_list:list statement:s          {:list.add(s); RESULT = list;:}
-				|                           {:RESULT = new Statement_List();:};
+statement_list ::= statement_list:list statement:s          
+				|;
 
-statement::= if_statement:s 							{:RESULT = s;:}
-		| jump_statement:s                                              {:RESULT = s;:}
-		| assignment_statement:s 					{:RESULT = s;:}
+statement::= if_statement:s 							
+		| jump_statement:s                                              
+		| assignment_statement:s 					
 		| function_call_statement 
 		| for_statement
-		| variable_declaration:s 					{:RESULT = s;:}
-		| while_statement:s 						{:RESULT = s;:}
-		| printf_statement:s 						{:RESULT = s;:}
-		| scanf_statement:s 						{:RESULT = s;:};
+		| variable_declaration:s 					
+		| while_statement:s 						
+		| printf_statement:s 						
+		| scanf_statement:s;
 
-statement_inside_if ::= LLAVEIZQUIERDA statement_list:s LLAVEDERECHA     {:RESULT = new Statement_Inside_If_Simple(s);:}
-                        |LLAVEIZQUIERDA statement_list:s1 LLAVEDERECHA ELSE LLAVEIZQUIERDA statement_list:s2 LLAVEDERECHA  {:RESULT = new Statement_Inside_If_Complex(s1,s2);:};
+statement_inside_if ::= LLAVEIZQUIERDA statement_list:s LLAVEDERECHA     
+                        |LLAVEIZQUIERDA statement_list:s1 LLAVEDERECHA ELSE LLAVEIZQUIERDA statement_list:s2 LLAVEDERECHA;
 
-printf_statement ::= PRINTF PARENTESISIZQUIERDO CONSTSTR:c COMA expr:e PARENTESISDERECHO PUNTOYCOMA     {:RESULT = new PrintFExpr(e,c);:}
-				| PRINTF PARENTESISIZQUIERDO CONSTSTR:c PARENTESISDERECHO PUNTOYCOMA 	{:RESULT = new PrintFString(c);:};
+printf_statement ::= PRINTF PARENTESISIZQUIERDO CONSTSTR:c COMA expr:e PARENTESISDERECHO PUNTOYCOMA     
+				| PRINTF PARENTESISIZQUIERDO CONSTSTR:c PARENTESISDERECHO PUNTOYCOMA;
 
-scanf_statement ::=  SCANF PARENTESISIZQUIERDO  flags:f COMA variable:v PARENTESISDERECHO PUNTOYCOMA    {:RESULT = new ScanF(f,v);:};
+scanf_statement ::=  SCANF PARENTESISIZQUIERDO  flags:f COMA variable:v PARENTESISDERECHO PUNTOYCOMA;
 
-flags ::= PERCENTAGEDIGIT        {:RESULT = new FlagD();:}
-	| PERCENTAGESTRING 	 {:RESULT = new FlagS();:}
-	| PERCENTAGECHART 	 {:RESULT = new FlagC();:};
+flags ::= PERCENTAGEDIGIT        
+	| PERCENTAGESTRING 	 
+	| PERCENTAGECHART;
 
-boolean_expression ::= relational_expression:rl logical_expression:le {:RESULT = new Boolean_Expression(rl,le);:};
+boolean_expression ::= relational_expression:rl logical_expression:le
+                    |scanf_statement relational_expression;
 
-relational_expression ::=  expr:e1 relational_operators:r expr:e2 {:RESULT = new Relational_Expression(e1,e2,r);:}
-							| PARENTESISIZQUIERDO relational_expression:rl PARENTESISDERECHO {:RESULT = rl;:}
+relational_expression ::=  expr:e1 relational_operators:r expr:e2 
+							| PARENTESISIZQUIERDO relational_expression:rl PARENTESISDERECHO 
 							| error {: parser.report_error("relational_expression","ERROR"); :} 
                                 MENORQUE expr
                               | error {: parser.report_error("relational_expression","ERROR"); :} 
@@ -226,56 +230,56 @@ relational_expression ::=  expr:e1 relational_operators:r expr:e2 {:RESULT = new
                               | error {: parser.report_error("relational_expression" ,"ERROR"); :} 
                                 MAYORIGUAL expr ;
 
-relational_operators ::=  MENORIGUAL      {:RESULT = new Operator_LTEQ();:}
-					| MENORQUE 			{:RESULT = new Operator_LT();:}
-					| MAYORQUE 			{:RESULT = new Operator_GT();:}
-					| MAYORIGUAL 			{:RESULT = new Operator_GTEQ();:}
-					| IGUALQUE 			{:RESULT = new Operator_EQEQ();:}
-					| NOTIGUAL			{:RESULT = new Operator_NOTEQ();:};
+relational_operators ::=  MENORIGUAL      
+					| MENORQUE 			
+					| MAYORQUE 			
+					| MAYORIGUAL 			
+					| IGUALQUE 			
+					| NOTIGUAL;
 
-logical_expression ::= logical_operators:lo boolean_expression:bo {:RESULT = new Logical_Expression(lo,bo);:}
-					|	{:RESULT = new Logical_Expression();:};
+logical_expression ::= logical_operators:lo boolean_expression:bo 
+					|	;
 
-logical_operators ::= ANDAND 		{:RESULT = new Logical_AND();:}
-					| OROR		{:RESULT = new Logical_OR();:}
+logical_operators ::= ANDAND 		
+					| OROR
 					;
 
-function_definition ::= type:t ID:id PARENTESISIZQUIERDO params:p PARENTESISDERECHO LLAVEIZQUIERDA statement_list:sl LLAVEDERECHA function_definition:list  {:list.add(new Function_Definition(t,p,sl)); RESULT = list;:}
-					|  {:RESULT = new Function_Definition_List();:}
+function_definition ::= type:t ID:id PARENTESISIZQUIERDO params:p PARENTESISDERECHO LLAVEIZQUIERDA statement_list:sl LLAVEDERECHA function_definition:list
+					|  
 					;
 
-assignment_statement ::= assignment_expression:a PUNTOYCOMA		{:RESULT = new Assignment_Statement(a);:};
+assignment_statement ::= assignment_expression:a PUNTOYCOMA;
 
-assignment_expression ::= variable_initialization:v assignment_expressionP:a                            {:RESULT = new Assignment_Expression_Var_Init(v,a);:}
-						| expr_increment:e assignment_expressionP:a		{:RESULT = new Assignment_Expression_Increment(e,a);:}
+assignment_expression ::= variable_initialization:v assignment_expressionP:a                            
+						| expr_increment:e assignment_expressionP:a		
 						;
-assignment_expressionP ::= variable_initialization:v assignment_expressionP:a                           {:RESULT = new Assignment_ExpressionP_Var(v,a);:}
-                            |{:RESULT = new Assignment_ExpressionP_Empty();:};
+assignment_expressionP ::= variable_initialization:v assignment_expressionP:a                           
+                            |;
 
 
-params ::= param_list:list                                              {:RESULT = new Params(list);:}
-		| {:RESULT = new Params();:};		
+params ::= param_list:list                                              
+		| ;		
 
-param_list ::= param_type_list:p param_listP:list 			{:list.add(p); RESULT = list;:}
+param_list ::= param_type_list:p param_listP:list 			
 			| error 
       {: parser.report_error("formal_parameter_list","ERROR"); :} 
     COMA param_type_list param_listP;
 
-param_listP ::= COMA param_type_list:p param_listP:list	{:list.add(p); RESULT = list;:}
-			|			{:RESULT = new Param_List_P();:}
+param_listP ::= COMA param_type_list:p param_listP:list	
+			|			
 			;
 
-param_type_list ::= type:t param_id:id 	{:RESULT = new Param_Type_List(t,id);:};
+param_type_list ::= type:t param_id:id 	;
 
-param_id ::= ID:id 							{:RESULT = new Param_Id_Identifier(id);:}
-		| ID:id CORCHETEIZQUIERDO CORCHETEDERECHO 		{:RESULT = new Param_Id_Array(id);:};
+param_id ::= ID:id 							
+		| ID:id CORCHETEIZQUIERDO CORCHETEDERECHO ;
 
-while_statement ::= WHILE PARENTESISIZQUIERDO boolean_expression:b PARENTESISDERECHO statement_inside_while:s {:RESULT = new While_Statement(b,s);:}
+while_statement ::= WHILE PARENTESISIZQUIERDO boolean_expression:b PARENTESISDERECHO statement_inside_while:s
 			| WHILE error 
-      {: parser.report_error("expression" , "WRONG"); :}
+      {: parser.report_error("expression" , "ERROR"); :}
     PARENTESISDERECHO statement;
 
-statement_inside_while ::= LLAVEIZQUIERDA statement_list:sl LLAVEDERECHA    {:RESULT = new Statement_Inside_While(sl);:};
+statement_inside_while ::= LLAVEIZQUIERDA statement_list:sl LLAVEDERECHA;
 
 for_statement ::= FOR PARENTESISIZQUIERDO expr_for PARENTESISDERECHO LLAVEIZQUIERDA statement_list LLAVEDERECHA;
 
@@ -285,9 +289,9 @@ E1 ::= init_for| ;
 E2 ::= condition| ;
 E3 ::= increment| ;
 
-constant ::= CONSTCHAR:c {:RESULT = new Literal_Char(c);:}
-		| CONSTSTR:s 	{:RESULT = new Literal_String(s);:}
-		| NUM:i		{:RESULT = new Literal_Integer(i);:}
+constant ::= CONSTCHAR:c 
+		| CONSTSTR:s 	
+		| NUM:i
 		;
 
 init_for ::= INT assignment_expression init_forP
@@ -307,24 +311,24 @@ conditionP ::= COMA ID relational_operators expr conditionP
 function_call ::= ID PARENTESISIZQUIERDO args PARENTESISDERECHO;
 function_call_statement ::= function_call PUNTOYCOMA;
 
-increment ::= expr_increment:e incrementP:i {:RESULT = new IncrementI(e,i);:};
+increment ::= expr_increment:e incrementP:i;
 
-incrementP ::= COMA expr_increment:e incrementP:i 		{:RESULT = new IncrementP_P(e,i);:}
-			|					{:RESULT = new IncrementP_Empty();:}
+incrementP ::= COMA expr_increment:e incrementP:i 		
+			|					
 			;
 
-expr_increment ::= variable:v inc:i 	{:RESULT = new Expression_Increment_VarInc(v,i);:} 
-				| inc_special:i variable:v {:RESULT = new Expression_Increment_Special_Variable(v,i);	:};
+expr_increment ::= variable:v inc:i 	
+				| inc_special:i variable:v ;
 
-inc ::= MENOSIGUAL expr:e  	{:RESULT = new Increment_MinEq(e);:}
-	| MENOSMENOS 		{:RESULT = new Increment_MinMin();:}
-	| MASIGUAL expr:e 	{:RESULT = new Increment_PlusEq(e);:} 
-	| MASMAS 			{:RESULT = new Increment_PlusPlus();:}
-	| DIVIGUAL expr:e 		 {:RESULT = new Increment_DivEq(e);:}
-	| MULTIIGUAL expr:e 	 {:RESULT = new Increment_MultEq(e);:};
+inc ::= MENOSIGUAL expr:e  	
+	| MENOSMENOS 		
+	| MASIGUAL expr:e 	 
+	| MASMAS 			
+	| DIVIGUAL expr:e 		 
+	| MULTIIGUAL expr:e 	 ;
 
-inc_special ::= MASMAS 	{:RESULT = new Increment_Special_PP();:}
-			| MENOSMENOS 	{:RESULT = new Increment_Special_MM();:};
+inc_special ::= MASMAS 	
+			| MENOSMENOS 	;
 
 args::= arg_list 
 		| ;
